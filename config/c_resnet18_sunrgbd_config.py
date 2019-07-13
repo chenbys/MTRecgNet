@@ -6,7 +6,7 @@ from datetime import datetime
 class RESNET18_SUNRGBD_CONFIG:
 
     def args(self):
-        args = {'ROOT_DIR': 'A:/workspace/TRecgNet/exp/resnet18'}
+        args = {'ROOT_DIR': '/home/chenjunjie_admin/workspace/TRecgNet/exp/resnet18'}
         current_time = datetime.now().strftime('%b%d_%H-%M-%S')
 
         ########### Quick Setup ############

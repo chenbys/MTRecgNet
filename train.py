@@ -69,7 +69,7 @@ def train():
 
         unlabeled_loader = DataProvider(cfg, dataset=unlabeled_dataset)
 
-    train_loader = DataProvider(cfg, dataset=train_dataset)
+    train_loader = DataProvider(cfg, dataset=train_dataset, batch_size=batch_size_val)
     val_loader = DataProvider(cfg, dataset=val_dataset, batch_size=batch_size_val, shuffle=False)
 
     # class weights

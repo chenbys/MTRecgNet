@@ -18,12 +18,12 @@ class DefaultConfig:
     IN_CONC = False  # if True, change input_nc from 3 to specific ones
 
     # PATH
-    DATA_DIR_TRAIN = 'A:/temp_dataset/SUN-RGBD/conc_data/train'
-    DATA_DIR_VAL = 'A:/temp_dataset/SUN-RGBD/conc_data/test'
+    DATA_DIR_TRAIN = '/home/chenjunjie_admin/workspace/dataset/SUNRGBD/conc_data/train'
+    DATA_DIR_VAL = '/home/chenjunjie_admin/workspace/dataset/SUNRGBD/conc_data/test'
     DATA_DIR_UNLABELED = '/home/dudapeng/workspace/datasets/nyud2/mix/conc_data/10k_conc_bak'
     SAMPLE_MODEL_PATH = None
     CHECKPOINTS_DIR = './checkpoints'
-    ROOT_DIR = 'A:/workspace/TRecgNet'
+    ROOT_DIR = '/home/chenjunjie_admin/workspace/TRecgNet'
     LOG_PATH = None
 
     # DATA

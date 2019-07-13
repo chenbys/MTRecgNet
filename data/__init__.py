@@ -5,8 +5,6 @@ class DataProvider():
     def __init__(self, cfg, dataset, batch_size=None, shuffle=True):
         super().__init__()
         self.dataset = dataset
-        if batch_size is None:
-            batch_size = cfg.BATCH_SIZE
         self.dataloader = torch.utils.data.DataLoader(
             self.dataset,
             batch_size=batch_size,
