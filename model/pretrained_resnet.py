@@ -9,7 +9,6 @@ class ResNet(nn.Module):
         super(ResNet, self).__init__()
 
         if resnet == 'resnet18':
-
             if cfg.CONTENT_PRETRAINED == 'place':
                 resnet_model = models.__dict__['resnet18'](num_classes=365)
                 load_path = "/home/dudapeng/workspace/pretrained/resnet18_places365.pth"

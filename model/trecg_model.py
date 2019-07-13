@@ -16,6 +16,7 @@ from .base_model import BaseModel
 import copy
 import math
 
+
 class TRecgNet(BaseModel):
 
     def __init__(self, cfg, vis=None, writer=None):
@@ -37,8 +38,7 @@ class TRecgNet(BaseModel):
         # networks
         self.use_noise = cfg.WHICH_DIRECTION == 'BtoA'
         self.net = networks.define_TrecgNet(cfg, self.use_noise, device=self.device)
-        networks.print_network(self.net)
-
+        # networks.print_network(self.net)
 
     def set_input(self, data, type='pair'):
 
@@ -246,7 +246,7 @@ class TRecgNet(BaseModel):
                 with torch.no_grad():
                     out_keys = self.build_output_keys(gen_img=True, cls=False)
                     [fake_source], self.loss = self.sample_model(source=self.target_modal,
-                                                      out_keys=out_keys, return_losses=False)
+                                                                 out_keys=out_keys, return_losses=False)
                 input_num = len(fake_source)
                 index = [i for i in range(0, input_num) if np.random.uniform() > 1 - self.cfg.FAKE_DATA_RATE]
                 for j in index:
@@ -275,11 +275,13 @@ class TRecgNet(BaseModel):
 
                 if self.cfg.EVALUATE:
                     out_keys = self.build_output_keys(gen_img=True, cls=True)
-                    [self.gen, self.cls], self.loss = self.net(self.source_modal, label=self.label, out_keys=out_keys, phase=self.phase)
+                    [self.gen, self.cls], self.loss = self.net(self.source_modal, label=self.label, out_keys=out_keys,
+                                                               phase=self.phase)
 
             else:
                 out_keys = self.build_output_keys(gen_img=False, cls=True)
-                [self.cls], self.loss = self.net(source=self.source_modal, label=self.label, out_keys=out_keys, phase=self.phase)
+                [self.cls], self.loss = self.net(source=self.source_modal, label=self.label, out_keys=out_keys,
+                                                 phase=self.phase)
 
         self.source_modal_show = self.source_modal
         self.target_modal_show = self.target_modal
@@ -307,7 +309,6 @@ class TRecgNet(BaseModel):
         if self.cfg.NITER_START_CONTENT <= epoch <= self.cfg.NITER_END_CONTENT:
 
             if 'SEMANTIC' in self.cfg.LOSS_TYPES:
-
                 content_loss = self.loss['content_loss'].mean()
                 loss_total = loss_total + content_loss
 
@@ -430,8 +431,8 @@ class TRecgNet(BaseModel):
             save_state_dict[k] = v
 
         state = {
-            'iter': iter,
-            'state_dict': save_state_dict,
+            'iter'        : iter,
+            'state_dict'  : save_state_dict,
             'optimizer_ED': self.optimizer_ED.state_dict(),
         }
         if 'GAN' in self.cfg.LOSS_TYPES:
@@ -618,9 +619,8 @@ class TRecgNet(BaseModel):
                                        global_step=global_step)
 
             if self.upsample and self.gen is not None and not self.cfg.NO_VIS:
-
-                    self.writer.add_image('Val_2_Gen', torchvision.utils.make_grid(self.gen[:6].clone().cpu().data, 3,
-                                                                                   normalize=True), global_step=global_step)
-                    self.writer.add_image('Val_3_Target',
-                                          torchvision.utils.make_grid(self.target_modal_show[:6].clone().cpu().data, 3,
+                self.writer.add_image('Val_2_Gen', torchvision.utils.make_grid(self.gen[:6].clone().cpu().data, 3,
+                                                                               normalize=True), global_step=global_step)
+                self.writer.add_image('Val_3_Target',
+                                      torchvision.utils.make_grid(self.target_modal_show[:6].clone().cpu().data, 3,
                                                                   normalize=True), global_step=global_step)

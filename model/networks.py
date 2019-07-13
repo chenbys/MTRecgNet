@@ -32,6 +32,7 @@ def init_weights(net, init_type='normal', gain=0.02):
 
 def fix_grad(net):
     print(net.__class__.__name__)
+
     def fix_func(m):
         classname = m.__class__.__name__
         if classname.find('Conv') != -1 or classname.find('BatchNorm2d') != -1:
@@ -52,27 +53,30 @@ def unfix_grad(net):
 
     net.apply(fix_func)
 
+
 def define_TrecgNet(cfg, use_noise=None, upsample=None, device=None):
     if upsample is None:
         upsample = not cfg.NO_UPSAMPLE
 
     if 'resnet' in cfg.ARCH:
         model = TRecgNet_Upsample_Resiual(cfg, encoder=cfg.ARCH, upsample=upsample,
-                            use_noise=use_noise, device=device)
+                                          use_noise=use_noise, device=device)
 
     return model
+
 
 def print_network(net):
     num_params = 0
     for param in net.parameters():
         num_params += param.numel()
-    print(net)
-    print('Total number of parameters: %d' % num_params)
+    # print(net)
+    # print('Total number of parameters: %d' % num_params)
+
 
 def conv3x3(in_planes, out_planes, stride=1):
-
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=1, bias=False)
+
 
 def conv_norm_relu(dim_in, dim_out, kernel_size=3, stride=1, padding=1, norm=nn.BatchNorm2d,
                    use_leakyRelu=False, use_bias=False, is_Sequential=True):
@@ -94,6 +98,7 @@ def conv_norm_relu(dim_in, dim_out, kernel_size=3, stride=1, padding=1, norm=nn.
             norm(dim_out, affine=True),
             act]
 
+
 def expand_Conv(module, in_channels):
     def expand_func(m):
         classname = m.__class__.__name__
@@ -111,7 +116,8 @@ def expand_Conv(module, in_channels):
 ##############################################################################
 class Upsample_Interpolate(nn.Module):
 
-    def __init__(self, dim_in, dim_out, kernel_size=3, padding=1, norm=nn.BatchNorm2d, scale=2, mode='bilinear', reduce_dim=False):
+    def __init__(self, dim_in, dim_out, kernel_size=3, padding=1, norm=nn.BatchNorm2d, scale=2, mode='bilinear',
+                 reduce_dim=False):
         super(Upsample_Interpolate, self).__init__()
         self.scale = scale
         self.mode = mode
@@ -120,7 +126,8 @@ class Upsample_Interpolate(nn.Module):
             self.conv_norm_relu1 = conv_norm_relu(dim_in, dim_out, kernel_size=1, stride=1, padding=0, norm=norm)
             self.conv_norm_relu2 = conv_norm_relu(dim_out, dim_in, kernel_size=3, stride=1, padding=1, norm=norm)
         else:
-            self.conv_norm_relu1 = conv_norm_relu(dim_in, dim_out, kernel_size=kernel_size, stride=1, padding=padding, norm=norm)
+            self.conv_norm_relu1 = conv_norm_relu(dim_in, dim_out, kernel_size=kernel_size, stride=1, padding=padding,
+                                                  norm=norm)
             self.conv_norm_relu2 = conv_norm_relu(dim_out, dim_out, kernel_size=3, stride=1, padding=1, norm=norm)
 
     def forward(self, x, activate=True):
@@ -129,11 +136,13 @@ class Upsample_Interpolate(nn.Module):
         x = self.conv_norm_relu2(x)
         return x
 
+
 class Upconv_ConvTransposed(nn.Module):
     def __init__(self, dim_in, dim_out, kernel_size=3, stride=1, padding=1, output_padding=1):
         super(Upconv_ConvTransposed, self).__init__()
         self.conv_bn_relu = nn.Sequential(
-            nn.ConvTranspose2d(dim_in, dim_out, kernel_size=kernel_size, stride=stride, padding=padding, output_padding=output_padding),
+            nn.ConvTranspose2d(dim_in, dim_out, kernel_size=kernel_size, stride=stride, padding=padding,
+                               output_padding=output_padding),
             nn.BatchNorm2d(dim_out),
             nn.ReLU(inplace=True)
         )
@@ -157,7 +166,6 @@ class UpBasicBlock(nn.Module):
         self.upsample = upsample
 
     def forward(self, x):
-
         residual = x
         if self.upsample is not None:
             x, conv_out = self.upsample(x, activate=False)
@@ -174,6 +182,8 @@ class UpBasicBlock(nn.Module):
         out = self.relu(out)
 
         return out
+
+
 #########################################
 class Discriminator(nn.Module):
     # initializers
@@ -210,6 +220,7 @@ class Discriminator(nn.Module):
 
     def forward(self, x):
         return self.model(x)
+
 
 ##############################################################################
 # Translate to recognize
@@ -345,11 +356,11 @@ class TRecgNet_Upsample_Resiual(nn.Module):
             nn.Tanh()
         )
 
-    def forward(self, source=None, target=None, label=None, out_keys=None, phase='train', content_layers=None, return_losses=True):
+    def forward(self, source=None, target=None, label=None, out_keys=None, phase='train', content_layers=None,
+                return_losses=True):
         out = {}
 
         if self.cfg.FIVE_CROP and phase == 'test':
-
             self.bs, self.ncrops, c, h, w = source.size()
             source = source.view(-1, c, h, w)
 
@@ -364,7 +375,6 @@ class TRecgNet_Upsample_Resiual(nn.Module):
         out['4'] = self.layer4(out['3'])
 
         if self.upsample and 'gen_img' in out_keys:
-
             skip1 = out['1']
             skip2 = out['2']
             skip3 = out['3']
@@ -375,7 +385,6 @@ class TRecgNet_Upsample_Resiual(nn.Module):
             upconv1 = self.deconv4(upconv2 + skip1)
 
             out['gen_img'] = self.up_image(upconv1)
-
 
         out['avgpool'] = self.avgpool(out['4'])
         avgpool = out['avgpool'].view(source.size(0), -1)
@@ -391,7 +400,6 @@ class TRecgNet_Upsample_Resiual(nn.Module):
                 loss_pix2pix = self.pix2pix_criterion(out['gen_img'], target) * self.cfg.ALPHA_PIX2PIX
 
             if 'SEMANTIC' in self.cfg.LOSS_TYPES and target is not None and phase == 'train':
-
                 loss_content = self.content_model(out['gen_img'], target, layers=content_layers) * self.cfg.ALPHA_CLS
 
             if 'CLS' in self.cfg.LOSS_TYPES and not self.cfg.UNLABELED:

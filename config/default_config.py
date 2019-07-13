@@ -1,11 +1,12 @@
 import warnings
 
+
 # base configuration, might be considered as the abstract class
 class DefaultConfig:
     # GPU / CPU
     GPU_IDS = None  # slipt different gpus with comma
-    nTHREADS = 8
-    WORKERS = 8
+    # nTHREADS = 8
+    WORKERS = 4
 
     # MODEL
     MODEL = 'trecg'
@@ -17,12 +18,12 @@ class DefaultConfig:
     IN_CONC = False  # if True, change input_nc from 3 to specific ones
 
     # PATH
-    DATA_DIR_TRAIN = '/home/dudapeng/workspace/datasets/sun_rgbd/data_in_class_mix/conc_data/train'
-    DATA_DIR_VAL = '/home/dudapeng/workspace/datasets/sun_rgbd/data_in_class_mix/conc_data/test'
+    DATA_DIR_TRAIN = 'A:/temp_dataset/SUN-RGBD/conc_data/train'
+    DATA_DIR_VAL = 'A:/temp_dataset/SUN-RGBD/conc_data/test'
     DATA_DIR_UNLABELED = '/home/dudapeng/workspace/datasets/nyud2/mix/conc_data/10k_conc_bak'
     SAMPLE_MODEL_PATH = None
     CHECKPOINTS_DIR = './checkpoints'
-    ROOT_DIR = '/home/dudapeng/workspace/trecgnet/'
+    ROOT_DIR = 'A:/workspace/TRecgNet'
     LOG_PATH = None
 
     # DATA
@@ -89,10 +90,12 @@ class DefaultConfig:
     def parse(self, kwargs):
         for k, v in kwargs.items():
             if not hasattr(self, k):
-                warnings.warn("Warning: opt has not attribut {0}".format(k))
+                # warnings.warn("Warning: opt has not attribut {0}".format(k))
+                print("Warning: opt has not attribut {0}".format(k))
+
             setattr(self, k, v)
 
         print('user config:')
-        for k, v in self.__class__.__dict__.items():
-            if not k.startswith('__'):
-                print(k, ':', getattr(self, k))
+        # for k, v in self.__class__.__dict__.items():
+        #     if not k.startswith('__'):
+        #         print(k, ':', getattr(self, k))
